@@ -1,20 +1,21 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using TMPro; 
-using System;  
+using TMPro;
+using System;
 
+[RequireComponent(typeof(AudioSource))] 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instancia { get; private set; }
 
-    [Header("Configuracion de Muerte")]
+    [Header("Configuración de Muerte")]
     public GameObject prefabExplosion;
     public AudioClip sonidoExplosion;
     public float retrasoReinicio = 1.0f;
 
-    [Header("Configuracion de Nivel")]
-    public int llavesTotales = 4; 
+    [Header("Configuración de Nivel")]
+    public int llavesTotales = 4;
     private int llavesActuales;
     public int vidasMaximas = 3;
     private int vidasActuales;
@@ -23,12 +24,19 @@ public class GameManager : MonoBehaviour
     [Header("Referencias de Escena")]
     public GameObject pelota;
     public Transform posicionInicio;
-    public PuertaSalida puertaSalida; 
+    public PuertaSalida puertaSalida;
+
+    private Vector3 vectorRespawnActual;
+    private Checkpoint checkpointActivo;
 
     [Header("Paneles UI")]
     public GameObject panelGameOver;
-    public GameObject panelNivelCompletado; 
-    public TextMeshProUGUI textoTiempoNivel;  
+    public GameObject panelNivelCompletado;
+    public TextMeshProUGUI textoTiempoNivel;
+    public AudioClip sonidoGameOver;
+    public AudioClip sonidoNivelCompletado; 
+
+    private AudioSource miAudioSource; 
 
     void Awake()
     {
@@ -41,13 +49,22 @@ public class GameManager : MonoBehaviour
             Instancia = this;
         }
 
+        miAudioSource = GetComponent<AudioSource>();
+
         Time.timeScale = 1f;
         llavesActuales = 0;
         vidasActuales = vidasMaximas;
         tiempoNivel = 0f;
 
+        vectorRespawnActual = posicionInicio.position;
+
         if (panelGameOver != null) panelGameOver.SetActive(false);
         if (panelNivelCompletado != null) panelNivelCompletado.SetActive(false);
+        if (UIManager.Instancia != null)
+        {
+            UIManager.Instancia.ActualizarVidas(vidasActuales);
+            UIManager.Instancia.IniciarLlaves(llavesTotales);
+        }
     }
 
     void Update()
@@ -61,10 +78,11 @@ public class GameManager : MonoBehaviour
     public void PerderJuego(Vector3 posicion)
     {
         AudioSource.PlayClipAtPoint(sonidoExplosion, posicion);
-        Instantiate(prefabExplosion, posicion, Quaternion.identity);
+        GameObject explosion = Instantiate(prefabExplosion, posicion, Quaternion.identity);
+        Destroy(explosion, 0.5f);
 
         vidasActuales--;
-        Debug.Log($"Vida perdida! Vidas restantes: {vidasActuales}");
+        if (UIManager.Instancia != null) UIManager.Instancia.ActualizarVidas(vidasActuales);
 
         if (vidasActuales > 0)
         {
@@ -80,7 +98,7 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(retrasoReinicio);
 
-        pelota.transform.position = posicionInicio.position;
+        pelota.transform.position = vectorRespawnActual;
         pelota.SetActive(true);
 
         Rigidbody2D rb = pelota.GetComponent<Rigidbody2D>();
@@ -93,6 +111,7 @@ public class GameManager : MonoBehaviour
 
     private void MostrarGameOver()
     {
+        if (sonidoGameOver != null) miAudioSource.PlayOneShot(sonidoGameOver); 
         if (panelGameOver != null) panelGameOver.SetActive(true);
         Time.timeScale = 0f;
     }
@@ -118,7 +137,7 @@ public class GameManager : MonoBehaviour
     public void RecogerLlave()
     {
         llavesActuales++;
-        Debug.Log($"Llave recogida! Tienes: {llavesActuales} / {llavesTotales}");
+        if (UIManager.Instancia != null) UIManager.Instancia.RemoverIconoLlave();
 
         if (llavesActuales >= llavesTotales)
         {
@@ -147,6 +166,8 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
         pelota.SetActive(false);
 
+        if (sonidoNivelCompletado != null) miAudioSource.PlayOneShot(sonidoNivelCompletado); 
+
         if (panelNivelCompletado != null)
         {
             panelNivelCompletado.SetActive(true);
@@ -171,8 +192,21 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Volviendo al menu.");
+            Debug.Log("¡No hay más niveles! Volviendo al menú.");
             VolverAlMenu();
         }
+    }
+
+    public void ActivarNuevoCheckpoint(Checkpoint nuevoCheckpoint)
+    {
+        if (checkpointActivo != null)
+        {
+            checkpointActivo.Desactivar();
+        }
+
+        checkpointActivo = nuevoCheckpoint;
+        checkpointActivo.Activar();
+
+        vectorRespawnActual = nuevoCheckpoint.transform.position;
     }
 }

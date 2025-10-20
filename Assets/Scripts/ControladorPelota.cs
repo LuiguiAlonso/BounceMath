@@ -70,5 +70,13 @@ public class ControladorPelota : MonoBehaviour
         {
             GameManager.Instancia.IntentarSalir();
         }
+        else if (other.CompareTag("Checkpoint")) 
+        {
+            Checkpoint checkpoint = other.GetComponent<Checkpoint>();
+            if (checkpoint != null)
+            {
+                GameManager.Instancia.ActivarNuevoCheckpoint(checkpoint);
+            }
+        }
     }
 }
