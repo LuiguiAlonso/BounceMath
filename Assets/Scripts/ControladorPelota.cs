@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class ControladorPelota : MonoBehaviour
 {
@@ -52,6 +53,22 @@ public class ControladorPelota : MonoBehaviour
         {
             GameManager.Instancia.PerderJuego(transform.position);
             gameObject.SetActive(false);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Llave"))
+        {
+            Llave llave = other.GetComponent<Llave>();
+            if (llave != null)
+            {
+                llave.Colectar();
+            }
+        }
+        else if (other.CompareTag("Salida"))
+        {
+            GameManager.Instancia.IntentarSalir();
         }
     }
 }
