@@ -45,4 +45,13 @@ public class ControladorPelota : MonoBehaviour
         Color colorRayo = estaEnSuelo ? Color.green : Color.red;
         Debug.DrawRay(transform.position, Vector2.down * distanciaRaycast, colorRayo);
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Obstaculo"))
+        {
+            GameManager.Instancia.PerderJuego(transform.position);
+            gameObject.SetActive(false);
+        }
+    }
 }

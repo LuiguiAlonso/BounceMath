@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Obstaculo
   layers:
   - Default
   - TransparentFX
@@ -40,6 +41,12 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Orden2
+    uniqueID: 2952852839
+    locked: 0
+  - name: Orden3
+    uniqueID: 2710931669
     locked: 0
   m_RenderingLayers:
   - Default
