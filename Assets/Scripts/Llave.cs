@@ -38,5 +38,6 @@ public class Llave : MonoBehaviour
         }
 
         GameManager.Instancia.RecogerLlave();
+        QuizManager.Instancia.SolicitarQuizDeLlave();
     }
 }

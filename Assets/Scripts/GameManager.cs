@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     public AudioClip sonidoExplosion;
     public float retrasoReinicio = 1.0f;
 
-    [Header("Configuración de Nivel")]
+    [Header("Configuracion de Nivel")]
     public int llavesTotales = 4;
     private int llavesActuales;
     public int vidasMaximas = 3;
@@ -166,7 +166,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
         pelota.SetActive(false);
 
-        if (sonidoNivelCompletado != null) miAudioSource.PlayOneShot(sonidoNivelCompletado); 
+        if (sonidoNivelCompletado != null) miAudioSource.PlayOneShot(sonidoNivelCompletado);
 
         if (panelNivelCompletado != null)
         {
@@ -175,9 +175,7 @@ public class GameManager : MonoBehaviour
 
         if (textoTiempoNivel != null)
         {
-            TimeSpan t = TimeSpan.FromSeconds(tiempoNivel);
-            string tiempoFormateado = string.Format("{0:D2}:{1:D2}", t.Minutes, t.Seconds);
-            textoTiempoNivel.text = $"Tiempo: {tiempoFormateado}";
+            textoTiempoNivel.text = $"Tiempo: {tiempoNivel:F1} sec";
         }
     }
 
@@ -208,5 +206,21 @@ public class GameManager : MonoBehaviour
         checkpointActivo.Activar();
 
         vectorRespawnActual = nuevoCheckpoint.transform.position;
+    }
+
+    public void PerderVidaPorQuiz()
+    {
+        vidasActuales--;
+        Debug.Log($"Vida perdida por quiz! Vidas restantes: {vidasActuales}");
+        
+        if (UIManager.Instancia != null)
+        {
+            UIManager.Instancia.ActualizarVidas(vidasActuales);
+        }
+
+        if (vidasActuales <= 0)
+        {
+            MostrarGameOver();
+        }
     }
 }
