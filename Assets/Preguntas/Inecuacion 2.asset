@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2ab1c3b3fa13b4a928f5b78b0518a8, type: 3}
   m_Name: Inecuacion 2
   m_EditorClassIdentifier: 
-  pregunta: "Si $-2x < 6$, \xBFcu\xE1l es el valor de $x$?"
+  pregunta: "Si tenemos dos condiciones: x > 3 y x < 7, \xBFqu\xE9 conector l\xF3gico
+    usamos para expresar correctamente que ambas deben cumplirse?\n\nA) \"O\" (disyunci\xF3n)\nB)
+    \"Ni\"\nC) \"Y\" (conjunci\xF3n)\nD) \"O bien\""
   alternativas:
-  - x < -3
-  - x > -3
-  - x < 3
-  - x > 3
-  indiceRespuestaCorrecta: 1
+  - A
+  - B
+  - C
+  - D
+  indiceRespuestaCorrecta: 2

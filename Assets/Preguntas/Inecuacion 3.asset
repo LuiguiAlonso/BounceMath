@@ -12,10 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2ab1c3b3fa13b4a928f5b78b0518a8, type: 3}
   m_Name: Inecuacion 3
   m_EditorClassIdentifier: 
-  pregunta: "Si $-2x < 6$, \xBFcu\xE1l es el valor de $x$?"
+  pregunta: "\xBFCu\xE1l de las siguientes afirmaciones es falsa sobre las inecuaciones?\n\nA)
+    En una inecuaci\xF3n, una cantidad puede ser mayor o menor que otra.\nB) En una
+    ecuaci\xF3n, los dos lados son iguales.\nC) En una inecuaci\xF3n, se puede representar
+    la soluci\xF3n en una recta num\xE9rica.\nD) Si multiplicamos por un n\xFAmero
+    negativo, el signo se mantiene igual."
   alternativas:
-  - x < -3
-  - x > -3
-  - x < 3
-  - x > 3
-  indiceRespuestaCorrecta: 1
+  - A
+  - B
+  - C
+  - D
+  indiceRespuestaCorrecta: 3

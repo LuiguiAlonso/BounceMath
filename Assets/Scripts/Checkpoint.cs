@@ -8,7 +8,7 @@ public class Checkpoint : MonoBehaviour
     public Sprite spriteEncendido;
 
     private SpriteRenderer spriteRenderer;
-    private bool estaActivado = false;
+    public bool estaActivado { get; private set; } = false;
 
     void Awake()
     {

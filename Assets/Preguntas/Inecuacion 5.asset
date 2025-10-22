@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2ab1c3b3fa13b4a928f5b78b0518a8, type: 3}
   m_Name: Inecuacion 5
   m_EditorClassIdentifier: 
-  pregunta: "Si $-2x < 6$, \xBFcu\xE1l es el valor de $x$?"
+  pregunta: "\xBFCu\xE1l de las siguientes expresiones est\xE1 mal escrita porque
+    le falta el conector l\xF3gico entre las condiciones?\n\nA) x < -2 o x > 3\nB)
+    x <= 1 y x >= -2\nC) x > 0 o x = 2\nD) x < -3 x > 3"
   alternativas:
-  - x < -3
-  - x > -3
-  - x < 3
-  - x > 3
-  indiceRespuestaCorrecta: 1
+  - A
+  - B
+  - C
+  - D
+  indiceRespuestaCorrecta: 3

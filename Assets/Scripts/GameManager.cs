@@ -223,4 +223,15 @@ public class GameManager : MonoBehaviour
             MostrarGameOver();
         }
     }
+
+    public void AumentarVida()
+    {
+        vidasActuales++;
+        Debug.Log($"Vida extra ganada! Vidas restantes: {vidasActuales}");
+
+        if (UIManager.Instancia != null)
+        {
+            UIManager.Instancia.ActualizarVidas(vidasActuales);
+        }
+    }
 }

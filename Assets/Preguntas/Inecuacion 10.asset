@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2ab1c3b3fa13b4a928f5b78b0518a8, type: 3}
   m_Name: Inecuacion 10
   m_EditorClassIdentifier: 
-  pregunta: "Si $-2x < 6$, \xBFcu\xE1l es el valor de $x$?"
+  pregunta: "Resuelve la inecuaci\xF3n: 7x + 2 >= 16\n\nA) x >= 2\nB) x > 3\nC) x
+    <= 2 \nD) x < 1"
   alternativas:
-  - x < -3
-  - x > -3
-  - x < 3
-  - x > 3
-  indiceRespuestaCorrecta: 1
+  - A
+  - B
+  - C
+  - D
+  indiceRespuestaCorrecta: 0

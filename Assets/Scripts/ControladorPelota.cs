@@ -1,18 +1,25 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+[RequireComponent(typeof(AudioSource))] 
 public class ControladorPelota : MonoBehaviour
 {
     public float velocidad = 6f;
     public float salto = 8f;
     public LayerMask capaSuelo;
     public float distanciaRaycast = 0.6f;
+
+    [Header("Sonidos")]
+    public AudioClip sonidoSalto; 
+
     private Rigidbody2D rb;
     private bool estaEnSuelo;
+    private AudioSource miAudioSource; 
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        miAudioSource = GetComponent<AudioSource>(); 
     }
 
     void Update()
@@ -31,6 +38,11 @@ public class ControladorPelota : MonoBehaviour
         if (estaEnSuelo && Input.GetButtonDown("Jump"))
         {
             rb.AddForce(Vector2.up * salto, ForceMode2D.Impulse);
+
+            if (miAudioSource != null && sonidoSalto != null)
+            {
+                miAudioSource.PlayOneShot(sonidoSalto);
+            }
         }
     }
 
@@ -70,12 +82,12 @@ public class ControladorPelota : MonoBehaviour
         {
             GameManager.Instancia.IntentarSalir();
         }
-        else if (other.CompareTag("Checkpoint")) 
+        else if (other.CompareTag("Checkpoint"))
         {
             Checkpoint checkpoint = other.GetComponent<Checkpoint>();
             if (checkpoint != null)
             {
-                GameManager.Instancia.ActivarNuevoCheckpoint(checkpoint);
+                QuizManager.Instancia.SolicitarQuizDeCheckpoint(checkpoint);
             }
         }
     }

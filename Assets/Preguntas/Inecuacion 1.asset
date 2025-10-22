@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2ab1c3b3fa13b4a928f5b78b0518a8, type: 3}
   m_Name: Inecuacion 1
   m_EditorClassIdentifier: 
-  pregunta: "Si -2x < 6, \xBFcu\xE1l es el valor de x?"
+  pregunta: "Al resolver una inecuaci\xF3n del tipo -2x < 6, \xBFqu\xE9 se debe hacer
+    con el signo de desigualdad cuando se divide entre un n\xFAmero negativo?\n\nA)
+    No se cambia el signo.\nB) Se cambia el signo de desigualdad.\nC) Se cambian
+    los n\xFAmeros de lado.\nD) Se vuelve una ecuaci\xF3n."
   alternativas:
-  - x < -3
-  - x > -3
-  - x < 3
-  - x > 3
+  - A
+  - B
+  - C
+  - D
   indiceRespuestaCorrecta: 1

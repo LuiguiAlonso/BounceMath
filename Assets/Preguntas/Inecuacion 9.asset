@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc2ab1c3b3fa13b4a928f5b78b0518a8, type: 3}
   m_Name: Inecuacion 9
   m_EditorClassIdentifier: 
-  pregunta: "Si $-2x < 6$, \xBFcu\xE1l es el valor de $x$?"
+  pregunta: "Cuando una inecuaci\xF3n tiene como soluci\xF3n todos los n\xFAmeros
+    reales (R), \xBFqu\xE9 significa eso?\n\nA) Que no existe ninguna soluci\xF3n.\nB)
+    Que solo algunos valores cumplen la condici\xF3n.\nC) Que cualquier n\xFAmero
+    que se elija cumple la inecuaci\xF3n.\nD) Que la inecuaci\xF3n no puede resolverse."
   alternativas:
-  - x < -3
-  - x > -3
-  - x < 3
-  - x > 3
-  indiceRespuestaCorrecta: 1
+  - A
+  - B
+  - C
+  - D
+  indiceRespuestaCorrecta: 2
