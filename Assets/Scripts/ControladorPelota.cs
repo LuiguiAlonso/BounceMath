@@ -87,8 +87,14 @@ public class ControladorPelota : MonoBehaviour
             Checkpoint checkpoint = other.GetComponent<Checkpoint>();
             if (checkpoint != null)
             {
-                QuizManager.Instancia.SolicitarQuizDeCheckpoint(checkpoint);
+                GameManager.Instancia.ActivarNuevoCheckpoint(checkpoint);
             }
         }
+    }
+
+    public void MorirPorQuiz(string feedback) 
+    {
+        GameManager.Instancia.FallarQuiz(feedback); 
+        gameObject.SetActive(false);
     }
 }

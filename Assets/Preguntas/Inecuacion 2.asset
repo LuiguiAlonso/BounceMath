@@ -21,3 +21,6 @@ MonoBehaviour:
   - C
   - D
   indiceRespuestaCorrecta: 2
+  feedbackSolucion: Y quiere decir que ambas inecuaciones deben cumplirse para cumplir
+    la condicion, O signfica que basta con que solo una de los dos inecuaciones se
+    cumpla.

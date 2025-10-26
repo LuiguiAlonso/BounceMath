@@ -22,3 +22,5 @@ MonoBehaviour:
   - C
   - D
   indiceRespuestaCorrecta: 1
+  feedbackSolucion: Cuando divides una toda la inecuacion con un numero negativo
+    entonces el signo debe invertirse!

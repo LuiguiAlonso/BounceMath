@@ -19,7 +19,10 @@ public class GameManager : MonoBehaviour
     private int llavesActuales;
     public int vidasMaximas = 3;
     private int vidasActuales;
-    private float tiempoNivel;
+    public int VidasActuales { get { return vidasActuales; } }
+    public float tiempoLimite = 60f; 
+    private float tiempoRestante;
+    private bool estaJuegoTerminado = false; 
 
     [Header("Referencias de Escena")]
     public GameObject pelota;
@@ -28,13 +31,19 @@ public class GameManager : MonoBehaviour
 
     private Vector3 vectorRespawnActual;
     private Checkpoint checkpointActivo;
+    private string feedbackPendiente = "";
 
     [Header("Paneles UI")]
     public GameObject panelGameOver;
     public GameObject panelNivelCompletado;
     public TextMeshProUGUI textoTiempoNivel;
     public AudioClip sonidoGameOver;
-    public AudioClip sonidoNivelCompletado; 
+    public AudioClip sonidoNivelCompletado;
+
+    [Header("UI Nivel Completado")] 
+    public UnityEngine.UI.Image[] estrellas; 
+    public Color colorEstrellaApagada = Color.black;
+    private int preguntasFallidas = 0;
 
     private AudioSource miAudioSource; 
 
@@ -51,10 +60,11 @@ public class GameManager : MonoBehaviour
 
         miAudioSource = GetComponent<AudioSource>();
 
+        estaJuegoTerminado = false;
         Time.timeScale = 1f;
         llavesActuales = 0;
         vidasActuales = vidasMaximas;
-        tiempoNivel = 0f;
+        tiempoRestante = tiempoLimite;
 
         vectorRespawnActual = posicionInicio.position;
 
@@ -64,14 +74,31 @@ public class GameManager : MonoBehaviour
         {
             UIManager.Instancia.ActualizarVidas(vidasActuales);
             UIManager.Instancia.IniciarLlaves(llavesTotales);
+            UIManager.Instancia.ActualizarTiempo(tiempoRestante);
         }
     }
 
     void Update()
     {
-        if (Time.timeScale > 0)
+        if (!estaJuegoTerminado)
         {
-            tiempoNivel += Time.deltaTime;
+            tiempoRestante -= Time.unscaledDeltaTime;
+
+            if (tiempoRestante <= 0)
+            {
+                tiempoRestante = 0;
+                Debug.Log("¡Se acabó el tiempo!");
+
+                if (pelota != null)
+                {
+                    pelota.SetActive(false);
+                }
+                MostrarGameOver();
+            }
+            if (UIManager.Instancia != null)
+            {
+                UIManager.Instancia.ActualizarTiempo(tiempoRestante);
+            }
         }
     }
 
@@ -80,38 +107,28 @@ public class GameManager : MonoBehaviour
         AudioSource.PlayClipAtPoint(sonidoExplosion, posicion);
         GameObject explosion = Instantiate(prefabExplosion, posicion, Quaternion.identity);
         Destroy(explosion, 0.5f);
+        ProcesarMuerte();
+    }
 
-        vidasActuales--;
-        if (UIManager.Instancia != null) UIManager.Instancia.ActualizarVidas(vidasActuales);
-
-        if (vidasActuales > 0)
-        {
-            StartCoroutine(RutinaRespawn());
-        }
-        else
-        {
-            MostrarGameOver();
-        }
+    public void FallarQuiz(string feedback) 
+    {
+        feedbackPendiente = feedback; 
+        ProcesarMuerte();
     }
 
     private IEnumerator RutinaRespawn()
     {
         yield return new WaitForSeconds(retrasoReinicio);
 
-        pelota.transform.position = vectorRespawnActual;
-        pelota.SetActive(true);
-
-        Rigidbody2D rb = pelota.GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.angularVelocity = 0f;
-        }
+        EjecutarRespawn();
     }
 
     private void MostrarGameOver()
     {
-        if (sonidoGameOver != null) miAudioSource.PlayOneShot(sonidoGameOver); 
+        if (estaJuegoTerminado) return;
+        estaJuegoTerminado = true;
+        QuizManager.Instancia.ForzarCierreQuiz();
+        if (sonidoGameOver != null) miAudioSource.PlayOneShot(sonidoGameOver);
         if (panelGameOver != null) panelGameOver.SetActive(true);
         Time.timeScale = 0f;
     }
@@ -163,6 +180,7 @@ public class GameManager : MonoBehaviour
 
     private void CompletarNivel()
     {
+        estaJuegoTerminado = true;
         Time.timeScale = 0f;
         pelota.SetActive(false);
 
@@ -175,8 +193,12 @@ public class GameManager : MonoBehaviour
 
         if (textoTiempoNivel != null)
         {
-            textoTiempoNivel.text = $"Tiempo: {tiempoNivel:F1} sec";
+            float tiempoUtilizado = tiempoLimite - tiempoRestante;
+            TimeSpan t = TimeSpan.FromSeconds(tiempoUtilizado);
+            string tiempoFormateado = string.Format("{0:D2}:{1:D2}", t.Minutes, t.Seconds);
+            textoTiempoNivel.text = $"Tiempo: {tiempoFormateado}";
         }
+        CalcularYMostrarEstrellas();
     }
 
     public void SiguienteNivel()
@@ -208,21 +230,6 @@ public class GameManager : MonoBehaviour
         vectorRespawnActual = nuevoCheckpoint.transform.position;
     }
 
-    public void PerderVidaPorQuiz()
-    {
-        vidasActuales--;
-        Debug.Log($"Vida perdida por quiz! Vidas restantes: {vidasActuales}");
-        
-        if (UIManager.Instancia != null)
-        {
-            UIManager.Instancia.ActualizarVidas(vidasActuales);
-        }
-
-        if (vidasActuales <= 0)
-        {
-            MostrarGameOver();
-        }
-    }
 
     public void AumentarVida()
     {
@@ -234,4 +241,78 @@ public class GameManager : MonoBehaviour
             UIManager.Instancia.ActualizarVidas(vidasActuales);
         }
     }
+
+    public void RegistrarFalloEnQuiz()
+    {
+        preguntasFallidas++;
+    }
+
+    private void ProcesarMuerte()
+    {
+        vidasActuales--;
+        Debug.Log($"Vida perdida! Vidas restantes: {vidasActuales}");
+
+        if (UIManager.Instancia != null)
+        {
+            UIManager.Instancia.ActualizarVidas(vidasActuales);
+        }
+
+        if (vidasActuales > 0)
+        {
+            StartCoroutine(RutinaRespawn());
+        }
+        else
+        {
+            MostrarGameOver();
+        }
+    }
+
+    private void EjecutarRespawn()
+    {
+        pelota.transform.position = vectorRespawnActual;
+        pelota.SetActive(true);
+
+        Rigidbody2D rb = pelota.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+        if (!string.IsNullOrEmpty(feedbackPendiente))
+        {
+            UIManager.Instancia.MostrarFeedback(feedbackPendiente);
+            feedbackPendiente = "";
+        }
+    }
+
+    private void CalcularYMostrarEstrellas()
+    {
+        int rating = 0;
+
+        if (preguntasFallidas == 0)
+        {
+            rating = 3;
+        }
+        else if (preguntasFallidas == 1)
+        {
+            rating = 2;
+        }
+        else 
+        {
+            rating = 1;
+        }
+
+        for (int i = 0; i < estrellas.Length; i++)
+        {
+            if (i < rating)
+            {
+                estrellas[i].color = Color.white;
+            }
+            else
+            {
+                estrellas[i].color = colorEstrellaApagada;
+            }
+        }
+    }
+
 }

@@ -28,6 +28,18 @@ public class Llave : MonoBehaviour
     {
         if (haSidoColectada) return;
 
+        // Ya no se auto-recolecta
+        // Pide al QuizManager que inicie el quiz,
+        // pasándose a sí misma como referencia.
+        QuizManager.Instancia.SolicitarQuizDeLlave(this);
+    }
+
+    // --- ¡NUEVO MÉTODO PÚBLICO! ---
+    // El QuizManager llamará a esto SOLO si la respuesta es correcta.
+    public void CompletarRecoleccion()
+    {
+        if (haSidoColectada) return;
+
         haSidoColectada = true;
         miCollider.enabled = false;
         spriteRenderer.color = colorRecogido;
@@ -37,7 +49,7 @@ public class Llave : MonoBehaviour
             miAudioSource.Play();
         }
 
+        // Avisa al GameManager (para que actualice la UI de llaves)
         GameManager.Instancia.RecogerLlave();
-        QuizManager.Instancia.SolicitarQuizDeLlave();
     }
 }

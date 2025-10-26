@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using System;
+using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
@@ -11,6 +13,14 @@ public class UIManager : MonoBehaviour
 
     [Header("Componentes de Llaves")]
     public List<GameObject> iconosLlave;
+
+    [Header("Componentes de Tiempo")] 
+    public TextMeshProUGUI textoTiempo;
+
+    [Header("Componentes de Feedback")] 
+    public TextMeshProUGUI textoFeedback;
+    public float duracionFeedback = 3.0f;
+    public float fadeFeedback = 0.5f;
 
     void Awake()
     {
@@ -50,5 +60,57 @@ public class UIManager : MonoBehaviour
                 break; 
             }
         }
+    }
+
+    public void ActualizarTiempo(float tiempoEnSegundos)
+    {
+        if (textoTiempo != null)
+        {
+            if (tiempoEnSegundos < 0)
+            {
+                tiempoEnSegundos = 0;
+            }
+
+            float segundos = Mathf.Ceil(tiempoEnSegundos);
+
+            textoTiempo.text = segundos.ToString("00");
+        }
+    }
+
+    public void MostrarFeedback(string mensaje)
+    {
+        if (textoFeedback != null)
+        {
+            StartCoroutine(RutinaMostrarFeedback(mensaje));
+        }
+    }
+
+    private IEnumerator RutinaMostrarFeedback(string mensaje)
+    {
+        textoFeedback.text = mensaje;
+        textoFeedback.gameObject.SetActive(true);
+
+        float tiempoPasado = 0;
+
+        while (tiempoPasado < fadeFeedback)
+        {
+            tiempoPasado += Time.deltaTime;
+            float alfa = Mathf.Lerp(0, 1, tiempoPasado / fadeFeedback);
+            textoFeedback.color = new Color(textoFeedback.color.r, textoFeedback.color.g, textoFeedback.color.b, alfa);
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(duracionFeedback);
+
+        tiempoPasado = 0;
+        while (tiempoPasado < fadeFeedback)
+        {
+            tiempoPasado += Time.deltaTime;
+            float alfa = Mathf.Lerp(1, 0, tiempoPasado / fadeFeedback);
+            textoFeedback.color = new Color(textoFeedback.color.r, textoFeedback.color.g, textoFeedback.color.b, alfa);
+            yield return null;
+        }
+
+        textoFeedback.gameObject.SetActive(false);
     }
 }

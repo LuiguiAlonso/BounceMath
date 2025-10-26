@@ -25,11 +25,8 @@ public class QuizManager : MonoBehaviour
 
     private PreguntaSO preguntaActual;
     private AudioSource miAudioSource;
+    private Llave llavePendiente;
 
-    // --- ¡NUEVAS VARIABLES! ---
-    private bool esQuizDeLlave;
-    private Checkpoint checkpointPendiente;
-    // ---------------------------
 
     void Awake()
     {
@@ -52,16 +49,11 @@ public class QuizManager : MonoBehaviour
         }
     }
 
-    public void SolicitarQuizDeLlave()
+    public void SolicitarQuizDeLlave(Llave llave)
     {
-        if (preguntasDeLlave.Count == 0)
-        {
-            Debug.LogWarning("No hay preguntas de llave asignadas.");
-            return;
-        }
+        if (preguntasDeLlave.Count == 0) return;
 
-        esQuizDeLlave = true; // Guardamos que es de Llave
-        checkpointPendiente = null;
+        llavePendiente = llave;
 
         Time.timeScale = 0f;
         preguntaActual = preguntasDeLlave[UnityEngine.Random.Range(0, preguntasDeLlave.Count)];
@@ -69,28 +61,6 @@ public class QuizManager : MonoBehaviour
         MostrarPregunta(preguntaActual);
     }
 
-    // --- ¡NUEVO MÉTODO! ---
-    public void SolicitarQuizDeCheckpoint(Checkpoint checkpoint)
-    {
-        // Si el checkpoint ya está activo, no hacemos nada
-        if (checkpoint.estaActivado) return;
-
-        // Si no hay preguntas, solo activa el checkpoint y ya
-        if (preguntasDeLlave.Count == 0)
-        {
-            GameManager.Instancia.ActivarNuevoCheckpoint(checkpoint);
-            return;
-        }
-
-        esQuizDeLlave = false; // Guardamos que es de Checkpoint
-        checkpointPendiente = checkpoint;
-
-        Time.timeScale = 0f;
-        preguntaActual = preguntasDeLlave[UnityEngine.Random.Range(0, preguntasDeLlave.Count)];
-
-        MostrarPregunta(preguntaActual);
-    }
-    // ---------------------------
 
     private void MostrarPregunta(PreguntaSO datos)
     {
@@ -117,8 +87,6 @@ public class QuizManager : MonoBehaviour
 
     private IEnumerator RutinaFeedback(bool esCorrecto)
     {
-        // ... (Toda la lógica del flash y sonido se queda igual) ...
-        // 1. Fade In
         panelFlash.gameObject.SetActive(true);
         Color colorFlash = esCorrecto ? Color.green : Color.red;
         if (esCorrecto) miAudioSource.PlayOneShot(sonidoCorrecto);
@@ -137,7 +105,6 @@ public class QuizManager : MonoBehaviour
 
         tiempoPasado = 0f;
 
-        // 2. Fade Out
         while (tiempoPasado < duracionFade)
         {
             tiempoPasado += Time.unscaledDeltaTime;
@@ -146,35 +113,39 @@ public class QuizManager : MonoBehaviour
             yield return null;
         }
 
-        // 3. Finalizar
         panelFlash.gameObject.SetActive(false);
 
-        // --- ¡LÓGICA MODIFICADA! ---
-        if (esQuizDeLlave)
+        if (esCorrecto)
         {
-            // Era un quiz de Llave
-            if (!esCorrecto)
+            if (llavePendiente != null)
             {
-                GameManager.Instancia.PerderVidaPorQuiz();
+                llavePendiente.CompletarRecoleccion();
             }
         }
         else
         {
-            // Era un quiz de Checkpoint
-            if (esCorrecto)
+            GameManager.Instancia.RegistrarFalloEnQuiz();
+            if (GameManager.Instancia.pelota != null)
             {
-                GameManager.Instancia.AumentarVida();
-            }
-
-            // Siempre activamos el checkpoint (al acertar o fallar)
-            if (checkpointPendiente != null)
-            {
-                GameManager.Instancia.ActivarNuevoCheckpoint(checkpointPendiente);
-                checkpointPendiente = null; // Limpiamos la referencia
+                string feedback = preguntaActual.feedbackSolucion;
+                GameManager.Instancia.pelota.GetComponent<ControladorPelota>().MorirPorQuiz(feedback);
             }
         }
-        // ---------------------------
+        llavePendiente = null;
 
-        Time.timeScale = 1f; // Reanuda el juego
+        if (GameManager.Instancia.VidasActuales > 0)
+        {
+            Time.timeScale = 1f;
+        }
+    }
+
+    public void ForzarCierreQuiz()
+    {
+        StopAllCoroutines();
+        panelQuiz.SetActive(false);
+        if (panelFlash != null)
+        {
+            panelFlash.gameObject.SetActive(false);
+        }
     }
 }
