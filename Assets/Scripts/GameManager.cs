@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour
     public void VolverAlMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MenuPrincipal");
+        SceneManager.LoadScene("Menu");
     }
 
     private void ReiniciarNivel()
@@ -289,29 +289,21 @@ public class GameManager : MonoBehaviour
     {
         int rating = 0;
 
-        if (preguntasFallidas == 0)
+        if (preguntasFallidas == 0) rating = 3;
+        else if (preguntasFallidas == 1) rating = 2;
+        else rating = 1;
+
+        string nombreEscenaActual = SceneManager.GetActiveScene().name;
+
+        if (DataManager.Instancia != null)
         {
-            rating = 3;
-        }
-        else if (preguntasFallidas == 1)
-        {
-            rating = 2;
-        }
-        else 
-        {
-            rating = 1;
+            DataManager.Instancia.GuardarEstrellas(nombreEscenaActual, rating);
         }
 
         for (int i = 0; i < estrellas.Length; i++)
         {
-            if (i < rating)
-            {
-                estrellas[i].color = Color.white;
-            }
-            else
-            {
-                estrellas[i].color = colorEstrellaApagada;
-            }
+            if (i < rating) estrellas[i].color = Color.white;
+            else estrellas[i].color = colorEstrellaApagada;
         }
     }
 
